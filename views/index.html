@@ -1,0 +1,135 @@
+{{ block "index" . }}
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
+        <link href="css/index.css" rel="stylesheet">
+        <title>Title</title>
+    </head>
+    <body>
+        {{ template "form" .Form }}
+        <hr/>
+        {{ template "display" .Data }}
+    <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+            document.body.addEventListener('htmx:beforeSwap', function (evt) {
+                if (evt.detail.xhr.status === 422)  {
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = false;
+                }
+            })
+        })
+    </script>
+    </body>
+    </html>
+
+{{ end }}
+
+{{ block "form" . }}
+    <form hx-swap="outerHTML" hx-post="/contacts">
+        name: <input
+                {{ if .Values.name }} value="{{ .Values.name }}" {{ end }}
+                type="text" name="name">
+
+        email: <input
+                {{ if .Values.email }} value="{{ .Values.email }}" {{ end }}
+                type="text" name="email">
+
+        {{ if .Errors.email }}
+            <div style="color: red">{{ .Errors.email}}</div>
+        {{ end }}
+        <button type="submit">Create Contact</button>
+    </form>
+{{ end }}
+
+{{ block "display" . }}
+    <div id="contacts" style="display: flex; flex-direction: column">
+        {{ range .Contacts}}
+            {{ template "contact" . }}
+        {{ end }}
+    </div>
+{{ end }}
+
+{{ block "contact" . }}
+    <div id="contact-{{ .ID }}" style="display: flex">
+        <div class="contact"
+             hx-indicator="#ci-{{ .ID }}"
+             hx-target="#contact-{{ .ID }}"
+             hx-swap="outerHTML swap:500ms"
+             hx-delete="/contacts/{{ .ID }}" style="width: 1rem; cursor: pointer">
+            <svg width="16" height="16" viewBox="0 0 135 140" xmlns="http://www.w3.org/2000/svg" fill="#494949">
+                <rect y="10" width="15" height="120" rx="6">
+                    <animate attributeName="height"
+                             begin="0.5s" dur="1s"
+                             values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                             repeatCount="indefinite" />
+                    <animate attributeName="y"
+                             begin="0.5s" dur="1s"
+                             values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                             repeatCount="indefinite" />
+                </rect>
+                <rect x="30" y="10" width="15" height="120" rx="6">
+                    <animate attributeName="height"
+                             begin="0.25s" dur="1s"
+                             values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                             repeatCount="indefinite" />
+                    <animate attributeName="y"
+                             begin="0.25s" dur="1s"
+                             values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                             repeatCount="indefinite" />
+                </rect>
+                <rect x="60" width="15" height="140" rx="6">
+                    <animate attributeName="height"
+                             begin="0s" dur="1s"
+                             values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                             repeatCount="indefinite" />
+                    <animate attributeName="y"
+                             begin="0s" dur="1s"
+                             values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                             repeatCount="indefinite" />
+                </rect>
+                <rect x="90" y="10" width="15" height="120" rx="6">
+                    <animate attributeName="height"
+                             begin="0.25s" dur="1s"
+                             values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                             repeatCount="indefinite" />
+                    <animate attributeName="y"
+                             begin="0.25s" dur="1s"
+                             values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                             repeatCount="indefinite" />
+                </rect>
+                <rect x="120" y="10" width="15" height="120" rx="6">
+                    <animate attributeName="height"
+                             begin="0.5s" dur="1s"
+                             values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+                             repeatCount="indefinite" />
+                    <animate attributeName="y"
+                             begin="0.5s" dur="1s"
+                             values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+                             repeatCount="indefinite" />
+                </rect>
+            </svg>
+        </div>
+        Name: <span >{{ .Name }}</span>
+        Email: <span >{{ .Email }}</span>
+
+        <div id="ci-{{ .ID }}" class="htmx-indicator">
+            <img src="/images/bars.svg" alt="loading" style="width: 1rem">
+        </div>
+    </div>
+{{ end }}
+
+{{ block "oob-contact" . }}
+    <div id="contacts" hx-swap-oob="afterbegin">
+        {{ template "contact" . }}
+    </div>
+{{ end }}
+
+{{ block "test" . }}
+    <div>
+        __TESTING__
+    </div>
+{{end}}
